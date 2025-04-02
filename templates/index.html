@@ -1,33 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flask Calculator</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <title>Smart Calculator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Simple Calculator</h1>
-        <form method="POST">
-            <input type="number" name="num1" step="any" placeholder="First number" required>
-            
-            <select name="operator" required>
-                <option value="+">+</option>
-                <option value="-">-</option>
-                <option value="*">*</option>
-                <option value="/">/</option>
-            </select>
+  <div class="container">
+    <h1>Smart Calculator</h1>
+    <form method="POST">
+      <input
+        type="text"
+        name="expression"
+        placeholder="Type a math expression or equation (e.g. x + 5 = 9)"
+        value="{{ expression }}"
+        required
+      >
+      <button type="submit">Calculate</button>
+    </form>
 
-            <input type="number" name="num2" step="any" placeholder="Second number" required>
-
-            <button type="submit">Calculate</button>
-        </form>
-
-        {% if result is not none %}
-            <div class="result">
-                <strong>Result:</strong> {{ result }}
-            </div>
-        {% endif %}
-    </div>
+    {% if result is not none %}
+      <div class="result">
+        <strong>Result:</strong> {{ result }}
+      </div>
+    {% endif %}
+  </div>
 </body>
 </html>
