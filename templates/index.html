@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Calculator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
-    <h1>Smart Calculator</h1>
+    <h1>🧠 Smart Calculator</h1>
+    <p class="helper-text">
+      Type an expression like <code>3 + 4 * 2</code><br />
+      Or solve an equation like <code>x + 5 = 9</code>
+    </p>
+
     <form method="POST">
       <input
         type="text"
         name="expression"
-        placeholder="Type a math expression or equation (e.g. x + 5 = 9)"
+        placeholder="Enter a math expression or equation"
         value="{{ expression }}"
         required
-      >
+      />
       <button type="submit">Calculate</button>
     </form>
 

@@ -1,39 +1,33 @@
 from flask import Flask, render_template, request
-import re
+
+# Auto-install sympy if needed
+try:
+    from sympy import symbols, Eq, solve, sympify
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "sympy"])
+    from sympy import symbols, Eq, solve, sympify
 
 app = Flask(__name__)
 
-def safe_eval(expr):
-    """Safely evaluate basic math expressions with order of operations."""
-    # Only allow numbers and math symbols
-    if not re.match(r'^[\d\s\+\-\*/\(\)\.]+$', expr):
-        raise ValueError("Invalid characters in expression")
-    return eval(expr, {"__builtins__": None}, {})
-
-def solve_for_x(equation):
-    """Solve simple linear equations of the form: x + 5 = 9"""
+def process_input(expression):
     try:
-        # Remove spaces
-        equation = equation.replace(" ", "")
-        left, right = equation.split("=")
-        if "x" not in equation:
-            raise ValueError("No variable to solve for.")
-
-        # Move all terms to one side: ax + b = c → ax = c - b
-        if "x" in left:
-            left_expr = left.replace("x", "1*x")
-            result = safe_eval(right) - safe_eval(re.sub(r"x", "0", left_expr))
-            coeff = safe_eval(left_expr.replace("x", "1"))
+        # Check for equation solving (contains "=")
+        if "=" in expression:
+            x = symbols("x")
+            left, right = expression.split("=")
+            left_expr = sympify(left.strip())
+            right_expr = sympify(right.strip())
+            equation = Eq(left_expr, right_expr)
+            solution = solve(equation, x)
+            return f"x = {solution[0]}" if solution else "No solution found."
         else:
-            right_expr = right.replace("x", "1*x")
-            result = safe_eval(left) - safe_eval(re.sub(r"x", "0", right_expr))
-            coeff = -safe_eval(right_expr.replace("x", "1"))
-
-        if coeff == 0:
-            return "No solution (x cancels out)"
-        return result / coeff
+            # Evaluate normal math expression
+            result = sympify(expression)
+            return result
     except Exception as e:
-        return f"Could not solve equation: {str(e)}"
+        return f"Error: {str(e)}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -42,14 +36,7 @@ def index():
 
     if request.method == "POST":
         expression = request.form["expression"]
-
-        try:
-            if "=" in expression:
-                result = solve_for_x(expression)
-            else:
-                result = safe_eval(expression)
-        except Exception as e:
-            result = f"Error: {str(e)}"
+        result = process_input(expression)
 
     return render_template("index.html", result=result, expression=expression)
 
